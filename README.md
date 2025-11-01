@@ -1,6 +1,6 @@
 # px6-proxy-fetcher
 
-Small helper that grabs your active proxies from [PROXY6.net](https://px6.me/) and drops them into a text file you can hand to whatever is doing the crawling.
+Small helper that grabs your active proxies from [PROXY6.net](https://px6.me/) and drops them into a text file you can hand to whatever is doing the crawling. I've leaned on PX6 as my low-cost proxy pool for months; it's been steady and easy to manage, so this script wraps the one task I end up repeating the most.
 
 ## getting started
 
@@ -28,8 +28,8 @@ If `python-dotenv` is present, a local `.env` file will be loaded automatically.
 0 */6 * * * cd /path/to/px6-proxy-fetcher && px6-proxy-fetcher -o /var/run/proxies.txt
 ```
 
-Keep `proxies.txt` out of Git—it holds authenticated endpoints. The included `.gitignore` already skips it.
+Keep `proxies.txt` out of Git-it holds authenticated endpoints. The included `.gitignore` already skips it.
 
 ## license
 
-MIT—see the included `LICENSE` file.
+MIT-see the included `LICENSE` file.

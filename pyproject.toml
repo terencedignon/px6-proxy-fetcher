@@ -9,7 +9,7 @@ description = "Fetch and export proxy listings from PROXY6.net."
 readme = "README.md"
 requires-python = ">=3.9"
 keywords = ["proxy", "px6", "proxy6", "crawler"]
-license = {text = "MIT"}
+license = "MIT"
 authors = [{name = "Terence Dignon"}]
 dependencies = ["requests>=2.31,<3"]
 
