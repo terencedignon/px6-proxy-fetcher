@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "px6-proxy-fetcher"
+version = "0.1.0"
+description = "Fetch and export proxy listings from PROXY6.net."
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["proxy", "px6", "proxy6", "crawler"]
+license = {text = "MIT"}
+authors = [{name = "Terence Dignon"}]
+dependencies = ["requests>=2.31,<3"]
+
+[project.optional-dependencies]
+dotenv = ["python-dotenv>=1.0,<2"]
+
+[project.scripts]
+px6-proxy-fetcher = "px6_proxy_fetcher.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
