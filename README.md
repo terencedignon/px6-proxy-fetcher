@@ -28,7 +28,7 @@ If `python-dotenv` is present, a local `.env` file will be loaded automatically.
 0 */6 * * * cd /path/to/px6-proxy-fetcher && px6-proxy-fetcher -o /var/run/proxies.txt
 ```
 
-Keep `proxies.txt` out of Git-it holds authenticated endpoints. The included `.gitignore` already skips it.
+Keep `proxies.txt` out of Git; it holds authenticated endpoints. The script writes it with 600 permissions so only your user can read it, and the included `.gitignore` already skips it.
 
 ## license
 

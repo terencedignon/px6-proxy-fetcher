@@ -1,31 +1,53 @@
+"""Tests for px6_proxy_fetcher core functionality."""
+
 import json
 
 import pytest
+import requests
 
-from px6_proxy_fetcher.core import Px6ProxyFetcherError, fetch_proxies
+from px6_proxy_fetcher.core import (
+    Px6ProxyFetcherError,
+    fetch_proxies,
+    write_proxies,
+)
 
 
 class _MockResponse:
-    def __init__(self, payload):
+    """Mock HTTP response for testing."""
+
+    def __init__(self, payload, exception=None):
         self._payload = payload
+        self._exception = exception
 
     def json(self):
+        """Return JSON payload or raise exception."""
         if isinstance(self._payload, Exception):
             raise self._payload
         return self._payload
 
+    def raise_for_status(self):
+        """Raise HTTP exception if configured."""
+        if self._exception:
+            raise self._exception
+
 
 class _MockSession:
-    def __init__(self, payload):
+    """Mock requests session for testing."""
+
+    def __init__(self, payload, exception=None):
         self._payload = payload
+        self._exception = exception
         self.called = False
 
     def get(self, url, timeout=30):
+        """Mock GET request."""
         self.called = True
-        return _MockResponse(self._payload)
+        self.timeout = timeout
+        return _MockResponse(self._payload, self._exception)
 
 
 def test_fetch_proxies_skips_inactive_records():
+    """Test that inactive proxies are filtered out from results."""
     payload = {
         "status": "yes",
         "list": {
@@ -51,6 +73,7 @@ def test_fetch_proxies_skips_inactive_records():
 
 
 def test_fetch_proxies_returns_empty_when_none_active():
+    """Test that an empty list is returned when all proxies are inactive."""
     payload = {
         "status": "yes",
         "list": {"1": {"active": "0"}},
@@ -64,6 +87,7 @@ def test_fetch_proxies_returns_empty_when_none_active():
 
 
 def test_fetch_proxies_returns_empty_for_zero_count():
+    """Test that an empty list is returned when list_count is zero."""
     payload = {"status": "yes", "list": {}, "list_count": 0}
     session = _MockSession(payload)
 
@@ -73,6 +97,7 @@ def test_fetch_proxies_returns_empty_for_zero_count():
 
 
 def test_fetch_proxies_brackets_ipv6_hosts():
+    """Test that IPv6 addresses are properly bracketed in proxy URLs."""
     payload = {
         "status": "yes",
         "list": [
@@ -96,6 +121,7 @@ def test_fetch_proxies_brackets_ipv6_hosts():
 
 
 def test_fetch_proxies_raises_when_api_reports_error():
+    """Test that API errors are properly raised as Px6ProxyFetcherError."""
     payload = {"status": "no", "error": "bad key"}
     session = _MockSession(payload)
 
@@ -106,8 +132,29 @@ def test_fetch_proxies_raises_when_api_reports_error():
 
 
 def test_fetch_proxies_raises_on_invalid_json():
+    """Test that invalid JSON responses raise Px6ProxyFetcherError."""
     payload = json.JSONDecodeError("fail", doc="", pos=0)
     session = _MockSession(payload)
 
     with pytest.raises(Px6ProxyFetcherError):
         fetch_proxies("dummy", session=session)
+
+
+def test_fetch_proxies_raises_on_http_error():
+    """Test that HTTP errors are converted to Px6ProxyFetcherError."""
+    session = _MockSession({}, exception=requests.HTTPError("boom"))
+
+    with pytest.raises(Px6ProxyFetcherError):
+        fetch_proxies("dummy", session=session)
+
+
+def test_write_proxies_sets_restrictive_permissions(tmp_path):
+    """Test that written proxy files have 0o600 permissions."""
+    output = tmp_path / "proxies.txt"
+
+    proxies = ["http://user:pass@proxy:1234"]
+    result_path = write_proxies(proxies, destination=output)
+
+    assert result_path == output
+    assert output.exists()
+    assert output.stat().st_mode & 0o777 == 0o600
