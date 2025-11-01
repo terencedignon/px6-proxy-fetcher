@@ -2,25 +2,34 @@
 
 Small helper that grabs your active proxies from [PROXY6.net](https://px6.me/) and drops them into a text file you can hand to whatever is doing the crawling. I've leaned on PX6 as my low-cost proxy pool for months; it's been steady and easy to manage, so this script wraps the one task I end up repeating the most.
 
-## getting started
+## installation
 
-Clone this repo, jump into it, and install it in editable mode:
+Install from PyPI:
 
 ```bash
-pip install -e .
-# want .env support? pip install -e .[dotenv]
+pip install px6-proxy-fetcher
+# want .env support? pip install px6-proxy-fetcher[dotenv]
 ```
 
-Run it after setting your API key:
+## getting started
+
+First, grab your API key from the [PROXY6.net dashboard](https://px6.me/). Then run it:
 
 ```bash
 export PX6_API_KEY="your_api_key_here"
 px6-proxy-fetcher --print-env
 ```
 
-That writes `proxies.txt` in the current directory and, with `--print-env`, emits the exports for `PROXY_LIST` and `PROXY_STRATEGY`. You can point the output elsewhere with `-o path/to/file.txt`. Verbosity toggles: `-q` for quiet, `-v` for chatty.
+That writes `proxies.txt` in the current directory containing your active proxies in `scheme://user:pass@host:port` format. With `--print-env`, it also emits shell exports for `PROXY_LIST` (comma-separated proxy URLs) and `PROXY_STRATEGY` (defaults to `round_robin`).
 
-If `python-dotenv` is present, a local `.env` file will be loaded automatically.
+Options:
+- `-o path/to/file.txt` - write to a different location
+- `-q` - quiet mode (errors only)
+- `-v` - verbose mode (debug output)
+- `--print-env` - output shell export statements
+- `--timeout SECONDS` - HTTP timeout for API requests (default: 30)
+
+If `python-dotenv` is installed, a local `.env` file will be loaded automatically.
 
 ## cron idea
 
@@ -30,6 +39,11 @@ If `python-dotenv` is present, a local `.env` file will be loaded automatically.
 
 Keep `proxies.txt` out of Git; it holds authenticated endpoints. The script writes it with 600 permissions so only your user can read it, and the included `.gitignore` already skips it.
 
+## requirements
+
+- Python 3.9 or later
+- A [PROXY6.net](https://px6.me/) account with an API key
+
 ## license
 
-MIT-see the included `LICENSE` file.
+MIT - see the included `LICENSE` file.
