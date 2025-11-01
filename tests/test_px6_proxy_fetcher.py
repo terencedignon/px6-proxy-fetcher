@@ -5,11 +5,9 @@ import json
 import pytest
 import requests
 
-from px6_proxy_fetcher.core import (
-    Px6ProxyFetcherError,
-    fetch_proxies,
-    write_proxies,
-)
+from px6_proxy_fetcher.core import Px6ProxyFetcherError
+from px6_proxy_fetcher.core import fetch_proxies
+from px6_proxy_fetcher.core import write_proxies
 
 
 class _MockResponse:
@@ -146,6 +144,16 @@ def test_fetch_proxies_raises_on_http_error():
 
     with pytest.raises(Px6ProxyFetcherError):
         fetch_proxies("dummy", session=session)
+
+
+def test_fetch_proxies_forwards_timeout_to_session():
+    """Test that the timeout parameter is properly forwarded to the session."""
+    payload = {"status": "yes", "list": {}, "list_count": 0}
+    session = _MockSession(payload)
+
+    fetch_proxies("dummy", session=session, timeout=5)
+
+    assert session.timeout == 5
 
 
 def test_write_proxies_sets_restrictive_permissions(tmp_path):

@@ -9,12 +9,10 @@ import sys
 
 from pathlib import Path
 
-from .core import (
-    Px6ProxyFetcherError,
-    fetch_proxies,
-    format_env_exports,
-    write_proxies,
-)
+from .core import Px6ProxyFetcherError
+from .core import fetch_proxies
+from .core import format_env_exports
+from .core import write_proxies
 
 
 def main(argv: list[str] | None = None) -> int:

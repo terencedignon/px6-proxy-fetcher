@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import json
 import logging
 import os
+from collections.abc import Mapping
+from collections.abc import Sequence
 from contextlib import suppress
+from datetime import datetime
+from datetime import timezone
 from pathlib import Path
-from typing import Mapping, MutableMapping, Sequence
 
 import requests
 
@@ -54,7 +56,7 @@ def fetch_proxies(
         raise Px6ProxyFetcherError(msg) from exc
 
     try:
-        payload: MutableMapping[str, object] = response.json()
+        payload: dict[str, object] = response.json()
     except json.JSONDecodeError as exc:
         raise Px6ProxyFetcherError("API response was not valid JSON") from exc
 
